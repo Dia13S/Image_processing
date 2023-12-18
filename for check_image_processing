@@ -1,0 +1,37 @@
+import cv2
+import numpy
+  
+  
+vid = cv2.VideoCapture(0) 
+ret, old_frame = vid.read()
+
+level = 30
+
+try:
+    while(True):
+        ret, frame = vid.read()
+
+        kernel_1 = 1/10000 * cv2.getStructuringElement(cv2.MORPH_ELLIPSE, [100, 100])
+
+        frame = cv2.filter2D(frame, ddepth=-1, kernel=kernel_1)
+        diff_data = numpy.abs(old_frame - frame)
+        diff_avg = diff_data.mean()
+
+        print(diff_avg)
+        old_frame = frame
+
+        if diff_avg > level:
+            cv2.circle(frame,(80,80), 20,(0,255,0), -1)
+
+        if diff_avg < level:
+            cv2.circle(frame,(80,80), 20,(0,0,255), -1)
+
+        cv2.imshow('frame', old_frame)
+        
+        if cv2.waitKey(25) & 0xFF == ord('q'): 
+            break
+except:
+    pass
+
+vid.release() 
+cv2.destroyAllWindows()
